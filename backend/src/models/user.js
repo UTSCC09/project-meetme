@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 
 const { Schema } = mongoose;
 
-const saltRounds = 10;
+const SALT_ROUNDS = 10;
 
 const userSchema = Schema(
     {
