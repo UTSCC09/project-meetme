@@ -2,7 +2,7 @@ import { Schema, model } from "mongoose";
 import bcrypt from "bcrypt";
 import { notificationSchema } from "./notification";
 
-const SALT_ROUNDS = 10;
+import { SALT_ROUNDS, EVENT_LIMIT } from "../utils/constants";
 
 const userSchema = Schema({
     username: {
@@ -22,7 +22,7 @@ const userSchema = Schema({
         type: Boolean,
         default: false,
     },
-    eventsOwned: [{ type: Schema.Types.ObjectId, ref: "Event" }],
+    eventsOwned: [{ type: Schema.ObjectId, ref: "Event" }],
     eventsParticipating: [{ type: Schema.Types.ObjectId, ref: "Event" }],
     notifications: [notificationSchema],
 });
@@ -41,6 +41,10 @@ userSchema.statics.isInUse = async function (email) {
 userSchema.methods.hasCorrectPass = async function (password) {
     const isCorrectPass = await bcrypt.compare(password, this.password);
     return isCorrectPass;
+};
+
+userSchema.methods.exceedsEventLimit = async function () {
+    return this.eventsOwned.length > EVENT_LIMIT;
 };
 
 const User = model("User", userSchema);

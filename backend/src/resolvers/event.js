@@ -1,4 +1,3 @@
-import startOfDay from "date-fns/startOfDay";
 import { eventCreationRules } from "../validators/eventValidator";
 
 const createEvent = async (
@@ -22,21 +21,26 @@ const createEvent = async (
         return err;
     }
 
-    try {
-        const event = await models.Event.create({
-            title,
-            description,
-            location,
-            ownerId: user._id,
-            startDate,
-            endDate,
-            timeslotLength,
-        });
-        await event.populate("ownerId");
-        return event;
-    } catch (err) {
-        return err;
+    const exceedsEventLimit = await user.exceedsEventLimit();
+    if (exceedsEventLimit) {
+        throw new Error("Event threshold exceeded");
     }
+
+    const event = await models.Event.create({
+        title,
+        description,
+        location,
+        ownerId: user._id,
+        startDate,
+        endDate,
+        timeslotLength,
+    });
+
+    await user.eventsOwned.push(event);
+    await user.save();
+    await event.populate("ownerId");
+
+    return event;
 };
 
 const eventResolvers = {
