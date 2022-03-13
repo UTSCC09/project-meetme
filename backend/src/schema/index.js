@@ -1,6 +1,7 @@
 import { gql } from "apollo-server-express";
 import userSchema from "./user";
 import eventSchema from "./event";
+import timeslotSchema from "./timeslot";
 
 // https://www.apollographql.com/blog/backend/schema-design/modularizing-your-graphql-schema-code/
 
@@ -14,4 +15,4 @@ const masterSchema = gql`
     }
 `;
 
-export default [masterSchema, userSchema, eventSchema];
+export default [masterSchema, userSchema, eventSchema, timeslotSchema];

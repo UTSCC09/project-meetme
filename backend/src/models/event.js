@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+import { isAfter, isBefore } from "date-fns";
 import { timeslotSchema } from "./timeslot";
 
 const eventSchema = Schema(
@@ -42,6 +43,12 @@ const eventSchema = Schema(
     { timestamp: true }
 );
 
-const Event = model("Event", eventSchema);
+eventSchema.methods.fitsInEvent = async function (datetime) {
+    console.log(isBefore(datetime, this.endDate));
+    return (
+        isAfter(datetime, this.startDate) && isBefore(datetime, this.endDate)
+    );
+};
 
+const Event = model("Event", eventSchema);
 export default Event;

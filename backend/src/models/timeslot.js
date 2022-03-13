@@ -1,14 +1,13 @@
 import { Schema, model } from "mongoose";
 
 export const timeslotSchema = Schema({
-    timestamp: {
+    datetime: {
         type: Date,
         required: true,
     },
     bookerId: { type: Schema.Types.ObjectId, ref: "User" },
-    description: String,
+    note: String,
 });
 
 const Timeslot = model("Timeslot", timeslotSchema);
-
 export default Timeslot;
