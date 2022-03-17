@@ -5,6 +5,7 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
 export default function Step2({ formStep, newEvent, handleChange }) {
+  //TODO: Maybe a bettter duration component
   if (formStep !== 2) {
     return null;
   }

@@ -8,8 +8,9 @@ import { CREATE_EVENT } from '../../graphql/mutations';
 import { GET_ME } from '../../graphql/queries';
 import { useMutation } from '@apollo/client';
 import { pick } from 'lodash';
-import { useAuth } from '../../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
+//TODO: Implement better validation, error states, disable continue until error resolution
 export default function CreateEvent() {
   const [newEvent, setNewEvent] = useState({
     title: '',
@@ -19,9 +20,12 @@ export default function CreateEvent() {
     timeslotLength: 30,
   });
   const [formStep, setFormStep] = useState(0);
-  const { refetchMe } = useAuth();
+  const navigate = useNavigate();
   const [createEvent, { data, loading, error }] = useMutation(CREATE_EVENT, {
     refetchQueries: [GET_ME],
+    onCompleted: ({ createEvent }) => {
+      navigate(`/cal/${createEvent._id}`);
+    },
   });
 
   // Leaving these in for debug as we're building

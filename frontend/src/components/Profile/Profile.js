@@ -1,13 +1,14 @@
 import { Typography, Button, List, Box } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EventItem from '../EventItem/EventItem';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import { useAuth } from '../../hooks/useAuth';
-//TODO: Create an event component, that represents the info from one event
-//TODO: Create an event list component that will take an array of events and display them, will need pagination implemented in the future
+import { useNavigate } from 'react-router-dom';
 
+//TODO: Create list component that supports pagination
+//TODO: refetch profile on visit to page?
 export default function Profile() {
   const { userProfile } = useAuth();
+  const navigate = useNavigate();
   return (
     <Box
       display="flex"
@@ -26,13 +27,14 @@ export default function Profile() {
         {userProfile.eventsOwned.map((evt) => (
           <EventItem
             key={evt._id}
+            id={evt._id}
             title={evt.title}
             startDate={evt.startDate}
             endDate={evt.endDate}
           />
         ))}
       </List>
-      <Button variant="contained" href="/create_event">
+      <Button variant="contained" onClick={() => navigate('/create_event')}>
         <AddIcon />
         Create Event
       </Button>

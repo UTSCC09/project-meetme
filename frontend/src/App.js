@@ -45,7 +45,7 @@ function App() {
             }
           />
           <Route
-            path="/event_cal"
+            path="/cal/:id"
             element={
               <ProtectedRoute>
                 <EventCalendar />
