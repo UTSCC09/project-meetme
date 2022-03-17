@@ -14,8 +14,9 @@ import { useAuth } from '../../hooks/useAuth';
 //TODO: Create an event component, that represents the info from one event
 //TODO: Create an event list component that will take an array of events and display them, will need pagination implemented in the future
 
-export function Profile() {
+export default function Profile() {
   const { userProfile } = useAuth();
+  console.log(userProfile);
   return (
     <Box
       display="flex"
@@ -55,4 +56,3 @@ export function Profile() {
     </Box>
   );
 }
-
