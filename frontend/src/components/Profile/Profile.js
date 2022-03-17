@@ -1,14 +1,6 @@
-import {
-  Typography,
-  Button,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Box,
-} from '@mui/material';
+import { Typography, Button, List, Box } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import EventItem from '../EventItem/EventItem';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import { useAuth } from '../../hooks/useAuth';
 //TODO: Create an event component, that represents the info from one event
@@ -16,7 +8,6 @@ import { useAuth } from '../../hooks/useAuth';
 
 export default function Profile() {
   const { userProfile } = useAuth();
-  console.log(userProfile);
   return (
     <Box
       display="flex"
@@ -32,22 +23,14 @@ export default function Profile() {
         Here's what you've got coming up
       </Typography>
       <List>
-        <ListItem>
-          <ListItemButton>
-            <ListItemIcon>
-              <CalendarMonthIcon />
-            </ListItemIcon>
-            <ListItemText primary="Halal trip to Vancouver" />
-          </ListItemButton>
-        </ListItem>
-        <ListItem>
-          <ListItemButton>
-            <ListItemIcon>
-              <CalendarMonthIcon />
-            </ListItemIcon>
-            <ListItemText primary="Bday week" />
-          </ListItemButton>
-        </ListItem>
+        {userProfile.eventsOwned.map((evt) => (
+          <EventItem
+            key={evt._id}
+            title={evt.title}
+            startDate={evt.startDate}
+            endDate={evt.endDate}
+          />
+        ))}
       </List>
       <Button variant="contained" href="/create_event">
         <AddIcon />

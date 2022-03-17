@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { loading, error, data, refetch: refetchMe } = useQuery(GET_ME);
+  const { loading, error, data } = useQuery(GET_ME);
 
   const redirect = () => {
     if (location.state?.from) {
@@ -80,7 +80,6 @@ export const AuthProvider = ({ children }) => {
         signup,
         authReady,
         userProfile,
-        refetchMe,
       }}
     >
       {children}

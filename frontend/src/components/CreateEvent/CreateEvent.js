@@ -5,6 +5,7 @@ import Step1 from './Step1';
 import Step2 from './Step2';
 import NavigationBar from './NavigationBar';
 import { CREATE_EVENT } from '../../graphql/mutations';
+import { GET_ME } from '../../graphql/queries';
 import { useMutation } from '@apollo/client';
 import { pick } from 'lodash';
 import { useAuth } from '../../hooks/useAuth';
@@ -18,10 +19,10 @@ export default function CreateEvent() {
     timeslotLength: 30,
   });
   const [formStep, setFormStep] = useState(0);
-  const [createEvent, { data, loading, error }] = useMutation(CREATE_EVENT, {
-    refetchQueries: [],
-  });
   const { refetchMe } = useAuth();
+  const [createEvent, { data, loading, error }] = useMutation(CREATE_EVENT, {
+    refetchQueries: [GET_ME],
+  });
 
   // Leaving these in for debug as we're building
   useEffect(() => {
@@ -60,9 +61,7 @@ export default function CreateEvent() {
 
   const submit = (e) => {
     e.preventDefault();
-    createEvent({ variables: { input: getCreateEventInput() } }).then(
-      refetchMe()
-    );
+    createEvent({ variables: { input: getCreateEventInput() } });
   };
 
   return (
