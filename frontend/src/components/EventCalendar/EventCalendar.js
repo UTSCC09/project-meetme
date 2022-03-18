@@ -6,25 +6,6 @@ import { GET_EVENT } from '../../graphql/queries';
 import { useQuery } from '@apollo/client';
 import { useParams } from 'react-router-dom';
 
-const appointments = [
-  {
-    title: 'Big Meeting',
-    allDay: true,
-    start: new Date(2022, 2, 17),
-    end: new Date(2022, 2, 17),
-  },
-  {
-    title: 'Vacation',
-    start: new Date(2021, 6, 7),
-    end: new Date(2021, 6, 10),
-  },
-  {
-    title: 'Conference',
-    start: new Date(2021, 6, 20),
-    end: new Date(2021, 6, 23),
-  },
-];
-
 export default function EventCalendar() {
   //Aliasing as eventId, maybe we should just rename the param to eventId in App
   const { id: eventId } = useParams();
