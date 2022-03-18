@@ -1,9 +1,10 @@
-import { useState } from 'react';
-import { Typography, Box, Button } from '@mui/material';
-import * as React from 'react';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import { Typography, Box } from '@mui/material';
+import React, { useEffect, useState } from 'react';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import OwnerCalendar from './OwnerCalendar';
+import { GET_EVENT } from '../../graphql/queries';
+import { useQuery } from '@apollo/client';
+import { useParams } from 'react-router-dom';
 
 const appointments = [
   {
@@ -25,24 +26,32 @@ const appointments = [
 ];
 
 export default function EventCalendar() {
-  const [allAvailableAppts, setAvailableAppts] = useState(appointments);
+  //Aliasing as eventId, maybe we should just rename the param to eventId in App
+  const { id: eventId } = useParams();
+  const { loading, error, data } = useQuery(GET_EVENT, {
+    variables: { id: eventId },
+  });
+
+  const [allAvailableAppts, setAvailableAppts] = useState([]);
   // TODO ^ change above to retrieve all available appts for this event
 
-  const eventTitle = 'This Event';
-  //TODO ^ change above to retrieve event title from BE
+  useEffect(() => {
+    // maybe we should unpack data? Not sure what the best pattern is for client side queries using apollo
+    setAvailableAppts(data?.event?.timeslots || []);
+
+    console.log(data);
+    console.log(error);
+  }, [error, data]);
+
   const eventUrl = 'Share link';
-  //TODO ^ change above to retrieve url from BE
+  //TODO: Maybe build out a button component that copys the current url to clipboard for sharing
+  //TODO: Conditonally render OwnerCalendar based on Owner status
 
   return (
     <React.Fragment>
       <Box display="flex" flexDirection="column" alignItems="center" m={1}>
-        <Typography>{eventTitle}</Typography>
+        <Typography variant="h4">{data?.event.title}</Typography>
         <Typography>{eventUrl}</Typography>
-        {/* TODO, remove below once we have a way for Bob to view Alice's calendar and book appt */}
-        <Button variant="contained" href="/book_appt">
-          <CalendarMonthIcon />
-          Book Appointment
-        </Button>
       </Box>
 
       <OwnerCalendar slots={allAvailableAppts} setSlots={setAvailableAppts} />

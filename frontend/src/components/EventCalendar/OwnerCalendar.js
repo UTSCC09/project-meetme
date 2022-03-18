@@ -16,7 +16,7 @@ export default function OwnerCalendar({ slots, setSlots }) {
 
     while (startTime < endTime) {
       const finTime = add(startTime, { minutes: slotLength });
-      //keys need to match, {startTime}==={startTime:startTime} is true
+      //keys needed to match, {startTime}==={startTime:startTime} is true
       const newSlot = { title: 'Empty slot', start: startTime, end: finTime };
       newSlots.push(newSlot);
       startTime = finTime;
