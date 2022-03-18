@@ -17,19 +17,22 @@ export default function EventCalendar() {
 
   useEffect(() => {
     //Really messy code sorry, need to extract into function
-    const formattedDates = data?.event?.timeslots.map((slot) => ({
-      start: new Date(slot.start * 1000),
-      end: new Date(slot.end * 1000),
-      title: slot.title,
-    }));
-    setAvailableAppts(formattedDates || []);
+    if (data) {
+      console.log(data);
+      console.log('got here');
+      const formattedDates = data?.event?.timeslots.map((slot) => ({
+        start: new Date(slot.start * 1000),
+        end: new Date(slot.end * 1000),
+        title: slot.title,
+      }));
+      setAvailableAppts(formattedDates || []);
+    }
 
-    console.log(data);
     console.log(error);
   }, [error, data]);
 
   const eventUrl = 'Share link';
-  //TODO: build out a button component that copys the current url to clipboard for sharing
+  //TODO: build out a button component that copys the current url to clipboard for sharing?
   //TODO: Conditonally render OwnerCalendar based on Owner status
 
   return (

@@ -15,7 +15,7 @@ export default function OwnerCalendar({ slots, setSlots, eventId }) {
   });
 
   const handleSelect = ({ start, end }) => {
-    const slotLength = 30; //TODO, change to retrieve from BE
+    const slotLength = 30; //TODO, Pass in as props
 
     let startTime = start;
     let endTime = end;
@@ -32,12 +32,9 @@ export default function OwnerCalendar({ slots, setSlots, eventId }) {
       newSlots.push(newSlot);
       startTime = finTime;
     }
-    //setState causes a rerender of component so call it after the loop to avoid unnecessary rerenders
-    console.log(newSlots);
     createSlots({
       variables: { input: { eventId: eventId, slots: newSlots } },
     });
-    //setSlots([...slots, ...newSlots]);
   };
 
   const locales = {
