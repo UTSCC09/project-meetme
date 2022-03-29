@@ -67,25 +67,34 @@ const createSlots = async (parent, { input }, { models, user }) => {
 const bookSlot = async (parent, { input }, { models, user }) => {
     const { eventId, slotId, title = "" } = input;
 
-    console.log("here");
-    let updatedSlot;
+    let event;
     try {
-        updatedSlot = await models.Event.findOneAndUpdate(
+        event = await models.Event.findOneAndUpdate(
             { " _id": eventId, "timeslots._id": slotId },
             {
                 $set: {
                     "timeslots.$.bookerId": user,
                     "timeslots.$.title": title,
                 },
-            }
+            },
+            { projection: { "timeslots.$": 1 } }
         );
     } catch (err) {
         console.log(err);
         throw new Error("Unable to update");
     }
 
-    console.log("there");
+    const updatedSlot = event.timeslots[0];
+    updatedSlot.bookerId = user;
+    updatedSlot.title = title;
 
+    pubsub
+        .publish(SLOT_UPDATED, {
+            slotUpdated: { type: "UPDATE", slot: updatedSlot },
+        })
+        .catch((err) => {
+            console.log(err);
+        });
     return updatedSlot;
 };
 
