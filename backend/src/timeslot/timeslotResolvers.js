@@ -1,4 +1,18 @@
+import { RedisPubSub } from "graphql-redis-subscriptions";
+import { PubSub } from "graphql-subscriptions";
+import redisClient from "../utils/redisLoader";
 import { slotCreationRules } from "./timeslotValidators";
+
+/*
+const pubsub = new RedisPubSub({
+    publisher: redisClient,
+    subscriber: redisClient,
+});
+*/
+
+const pubsub = new PubSub();
+
+const SLOT_UPDATED = "slot_updated";
 
 const createSlot = async (parent, { input }, { models }) => {
     const { eventId, datetime, note } = input;
@@ -43,9 +57,20 @@ const createSlots = async (parent, { input }, { models, user }) => {
         { _id: eventId },
         { $push: { timeslots: createdSlots } }
     );
-    const updatedEvent = await models.Event.findOne({ _id: eventId });
-    await updatedEvent.populate("timeslots");
-    return updatedEvent.timeslots;
+    createdSlots.map((slot) =>
+        pubsub
+            .publish(SLOT_UPDATED, { slotUpdate: { type: "CREATE", slot } })
+            .then((res) => {
+                console.log(res);
+                console.log("done");
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+    );
+    console.log("DONE");
+
+    return createdSlots;
 };
 
 const bookSlot = async (parent, { input }, { models, user }) => {
@@ -150,6 +175,23 @@ const timeslotResolvers = {
         unbookSlot,
         deleteSlot,
         addPeerId,
+    },
+    Subscription: {
+        slotUpdated: {
+            subscribe: (_, args) => {
+                console.log("UHOH");
+                return pubsub.asyncIterator(SLOT_UPDATED);
+            },
+        },
+        hello: {
+            // Example using an async generator
+
+            async *subscribe() {
+                for await (const word of ["Hello", "Bonjour", "Ciao"]) {
+                    yield { hello: word };
+                }
+            },
+        },
     },
 };
 

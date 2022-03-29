@@ -12,6 +12,9 @@ export default gql`
         deleteSlot(input: deleteSlotInput!): Timeslot!
         addPeerId(input: peerCxnInput!): Timeslot!
     }
+    extend type Subscription {
+        slotUpdated: slotUpdate
+    }
 
     type Timeslot {
         _id: ID!
@@ -44,5 +47,9 @@ export default gql`
         eventId: ID!
         slotId: ID!
         peerId: ID!
+    }
+    type slotUpdate {
+        type: String!
+        slot: Timeslot
     }
 `;
