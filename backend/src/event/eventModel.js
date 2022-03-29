@@ -49,5 +49,34 @@ eventSchema.methods.fitsInEvent = async function (datetime) {
     );
 };
 
+eventSchema.statics.addSlots = async function (eventId, slots) {
+    await this.updateOne(
+        { _id: eventId },
+        { $push: { timeslots: slots } }
+    ).catch((err) => {
+        console.log(err);
+        throw new Error("Failed to add timeslots");
+    });
+};
+
+eventSchema.statics.bookSlot = async (eventId, slotId, user, title) => {
+    console.log("got ehre");
+    const updatedSlot = await this.findOneAndUpdate(
+        { " _id": eventId, "timeslots._id": slotId },
+        {
+            $set: {
+                "timeslots.$.bookerId": user,
+                "timeslots.$.title": title,
+            },
+        }
+    ).catch((err) => {
+        console.log(err);
+        throw new Error("Error booking slot");
+    });
+    console.log("Got here?");
+    console.log(updatedSlot);
+    return updatedSlot;
+};
+
 const Event = model("Event", eventSchema);
 export default Event;

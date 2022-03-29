@@ -1,16 +1,11 @@
 import { RedisPubSub } from "graphql-redis-subscriptions";
-import { PubSub } from "graphql-subscriptions";
-import redisClient from "../utils/redisLoader";
+import getRedisClient from "../utils/redisLoader";
 import { slotCreationRules } from "./timeslotValidators";
 
-/*
 const pubsub = new RedisPubSub({
-    publisher: redisClient,
-    subscriber: redisClient,
+    publisher: getRedisClient(),
+    subscriber: getRedisClient(),
 });
-*/
-
-const pubsub = new PubSub();
 
 const SLOT_UPDATED = "slot_updated";
 
@@ -49,32 +44,30 @@ const createSlot = async (parent, { input }, { models }) => {
 const createSlots = async (parent, { input }, { models, user }) => {
     const { eventId, slots } = input;
     const event = await models.Event.findOne({ _id: eventId });
+
     if (!user._id.equals(event.ownerId)) {
         throw new Error("Unauthorized to create slots on non-owned calendar");
     }
+
     const createdSlots = await models.Timeslot.create(...slots);
-    await models.Event.updateOne(
-        { _id: eventId },
-        { $push: { timeslots: createdSlots } }
-    );
+
+    await models.Event.addSlots(eventId, createdSlots);
+
     createdSlots.map((slot) =>
         pubsub
-            .publish(SLOT_UPDATED, { slotUpdate: { type: "CREATE", slot } })
-            .then((res) => {
-                console.log(res);
-                console.log("done");
-            })
+            .publish(SLOT_UPDATED, { slotUpdated: { type: "CREATE", slot } })
             .catch((err) => {
                 console.log(err);
             })
     );
-    console.log("DONE");
 
     return createdSlots;
 };
 
 const bookSlot = async (parent, { input }, { models, user }) => {
     const { eventId, slotId, title = "" } = input;
+
+    console.log("here");
     let updatedSlot;
     try {
         updatedSlot = await models.Event.findOneAndUpdate(
@@ -90,6 +83,8 @@ const bookSlot = async (parent, { input }, { models, user }) => {
         console.log(err);
         throw new Error("Unable to update");
     }
+
+    console.log("there");
 
     return updatedSlot;
 };
@@ -178,19 +173,7 @@ const timeslotResolvers = {
     },
     Subscription: {
         slotUpdated: {
-            subscribe: (_, args) => {
-                console.log("UHOH");
-                return pubsub.asyncIterator(SLOT_UPDATED);
-            },
-        },
-        hello: {
-            // Example using an async generator
-
-            async *subscribe() {
-                for await (const word of ["Hello", "Bonjour", "Ciao"]) {
-                    yield { hello: word };
-                }
-            },
+            subscribe: (_, args) => pubsub.asyncIterator([SLOT_UPDATED]),
         },
     },
 };
