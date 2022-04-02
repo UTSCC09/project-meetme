@@ -34,9 +34,12 @@ const createSlots = async (parent, { input }, { models, user }) => {
         ? createdSlots
         : [createdSlots];
 
-    createdSlotsArray.map((slot) => publish(eventId, "CREATE", slot));
+    const populatedResult = await Promise.all(
+        createdSlotsArray.map((slot) => slot.populate("bookerId"))
+    );
+    populatedResult.map((slot) => publish(eventId, "CREATE", slot));
 
-    return createdSlotsArray;
+    return populatedResult;
 };
 
 const bookSlot = async (parent, { input }, { models, user }) => {
@@ -76,6 +79,7 @@ const unbookSlot = async (parent, { input }, { models }) => {
     // await models.Event.unbookSlot(eventId, slotId, title, comment);
 
     const unbookedSlot = await models.Timeslot.unbookSlot(slotId);
+    await unbookedSlot.populate("bookerId");
 
     publish(eventId, "UPDATE", unbookedSlot);
 
@@ -92,6 +96,7 @@ const deleteSlot = async (parent, { input }, { models, user }) => {
     // @DEPRECATED
     // const toDelete = await models.Event.getSlot(eventId, slotId);
     const toDelete = await models.Timeslot.getSlot(slotId);
+    await toDelete.populate("bookerId");
 
     await models.Timeslot.deleteSlot(slotId);
     //
@@ -105,6 +110,7 @@ const deleteSlot = async (parent, { input }, { models, user }) => {
 const getSlot = async (parent, { input }, { models }) => {
     const { eventId, slotId } = input;
     const slot = await models.Timeslot.getSlot(slotId);
+    await slot.populate("bookerId");
     return slot;
 };
 
@@ -121,7 +127,10 @@ const addPeerId = async (parent, { input }, { models }) => {
 const getSlotsBetween = async (parent, { input }, { models }) => {
     const { eventId, start, end } = input;
     const result = await models.Timeslot.getSlotsBetween(eventId, start, end);
-    return result;
+    const populatedResult = await Promise.all(
+        result.map((slot) => slot.populate("bookerId"))
+    );
+    return populatedResult;
 };
 
 const timeslotResolvers = {

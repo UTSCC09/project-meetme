@@ -61,7 +61,13 @@ const getEvent = async (parent, { id }, { models }) => {
     if (!event) {
         throw new Error("Event not found");
     }
-    event.timeslots = await models.Timeslot.getSlots(id);
+    const timeslots = await models.Timeslot.getSlots(id);
+    const slotArray = Array.isArray(timeslots) ? timeslots : [timeslots];
+
+    event.timeslots = await Promise.all(
+        slotArray.map((slot) => slot.populate("bookerId"))
+    );
+
     return event;
 };
 

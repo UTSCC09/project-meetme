@@ -20,10 +20,16 @@ export default gql`
         _id: ID!
         start: String!
         end: String!
-        bookerId: User
+        bookerId: Booker
         title: String
         peerId: String
         comment: String
+    }
+
+    type Booker {
+        _id: ID
+        username: String
+        email: String
     }
 
     input createSlotInput {
