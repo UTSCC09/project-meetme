@@ -3,6 +3,7 @@ import { gql } from "apollo-server-express";
 export default gql`
     extend type Query {
         getSlot(input: deleteSlotInput!): Timeslot!
+        getSlotsBetween(input: getSlotsInput!): [Timeslot]
     }
     extend type Mutation {
         createSlots(input: createSlotsInput!): [Timeslot]
@@ -12,7 +13,7 @@ export default gql`
         addPeerId(input: peerCxnInput!): Timeslot!
     }
     extend type Subscription {
-        slotUpdated: slotUpdate
+        slotUpdated(eventId: ID, start: String, end: String): slotUpdate
     }
 
     type Timeslot {
@@ -29,6 +30,11 @@ export default gql`
         start: String!
         end: String!
         title: String
+    }
+    input getSlotsInput {
+        eventId: ID!
+        start: String!
+        end: String!
     }
     input createSlotsInput {
         eventId: ID!
@@ -51,5 +57,10 @@ export default gql`
     type slotUpdate {
         type: String!
         slot: Timeslot
+    }
+    type subInput {
+        eventId: ID!
+        start: String
+        end: String
     }
 `;

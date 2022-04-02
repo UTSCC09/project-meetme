@@ -50,17 +50,25 @@ const deleteEvent = async (parent, { input }, { models }) => {
     return true;
 };
 
+const getEvent = async (parent, { id }, { models }) => {
+    const event = await models.Event.findOne({ _id: id })
+        .populate("ownerId")
+        .catch((err) => {
+            console.log(err);
+            throw new Error("Event not found");
+        });
+
+    if (!event) {
+        throw new Error("Event not found");
+    }
+    event.timeslots = await models.Timeslot.getSlots(id);
+    return event;
+};
+
 const eventResolvers = {
     Query: {
-        event: async (parent, { id }, { models }) =>
-            models.Event.findOne({ _id: id })
-                .populate("ownerId")
-                .catch((err) => {
-                    console.log(err);
-                    throw new Error("Event not found");
-                }),
+        event: getEvent,
     },
-
     Mutation: {
         createEvent,
         deleteEvent,
