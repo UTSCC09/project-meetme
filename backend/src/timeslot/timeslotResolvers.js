@@ -30,9 +30,13 @@ const createSlots = async (parent, { input }, { models, user }) => {
     // @DEPRECATED
     // await models.Event.addSlots(eventId, createdSlots);
 
-    createdSlots.map((slot) => publish(eventId, "CREATE", slot));
+    const createdSlotsArray = Array.isArray(createdSlots)
+        ? createdSlots
+        : [createdSlots];
 
-    return createdSlots;
+    createdSlotsArray.map((slot) => publish(eventId, "CREATE", slot));
+
+    return createdSlotsArray;
 };
 
 const bookSlot = async (parent, { input }, { models, user }) => {
@@ -137,10 +141,9 @@ const timeslotResolvers = {
             subscribe: withFilter(
                 (_, args) =>
                     pubsub.asyncIterator(`${SLOT_UPDATED}.${args.eventId}`),
-                (payload, variables) => (
-                        variables.start <= payload.slotUpdated.slot.start &&
-                        variables.end >= payload.slotUpdated.slot.end
-                    )
+                (payload, variables) =>
+                    variables.start <= payload.slotUpdated.slot.start &&
+                    variables.end >= payload.slotUpdated.slot.end
             ),
         },
     },
