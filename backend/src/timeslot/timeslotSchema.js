@@ -5,7 +5,6 @@ export default gql`
         getSlot(input: deleteSlotInput!): Timeslot!
     }
     extend type Mutation {
-        createSlot(input: createSlotInput): Timeslot
         createSlots(input: createSlotsInput!): [Timeslot]
         bookSlot(input: bookSlotInput!): Timeslot!
         unbookSlot(input: bookSlotInput!): Timeslot!
@@ -23,6 +22,7 @@ export default gql`
         bookerId: User
         title: String
         peerId: String
+        comment: String
     }
 
     input createSlotInput {
