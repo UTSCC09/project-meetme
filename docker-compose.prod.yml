@@ -48,6 +48,11 @@ services:
     ports: 
       - 3000:80
 
+  peerserver:
+    build:
+      context: ./peerServer
+      dockerfile: Dockerfile
+
   watchtower:
     image: containrrr/watchtower
     volumes:
