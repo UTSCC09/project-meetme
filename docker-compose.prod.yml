@@ -52,6 +52,8 @@ services:
     build:
       context: ./peerServer
       dockerfile: Dockerfile
+    expose:
+      - 4000
 
   watchtower:
     image: containrrr/watchtower
