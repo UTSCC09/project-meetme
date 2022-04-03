@@ -73,10 +73,10 @@ export default function OwnerCalendar({
         _id: _id,
         who: bookerId._id,
         when: startWhen + ' - ' + endWhen,
-        cmnts: comment,
+        cmnts: comment ? comment : '',
         peerIn: peerId ? peerId : null,
       };
-      setBookerJoined(peerId != null);
+      setBookerJoined(peerId != null && peerId !== callEnded);
       setSlotInfo(slInfo);
       setSeeSlotInfo(true);
       setSeeSlot(false);

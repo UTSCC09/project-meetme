@@ -17,7 +17,6 @@ export default function VideoCall() {
   const peerInstance = useRef(null);
   const [beforeCall, setBeforeCall] = useState(true);
   const [inCall, setInCall] = useState(false);
-  const [beginDisabled, setBeginDisabled] = useState(false);
   const [bookerJoined, setBookerJoined] = useState(false);
 
   const { userProfile } = useAuth();
@@ -64,18 +63,46 @@ export default function VideoCall() {
       if (currentUserVideoRef.current)
         currentUserVideoRef.current.srcObject = null;
       if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
-      if (peerInstance.current) peerInstance.current.disconnect();
+      peerInstance.current = null;
+      //if (peerInstance.current) peerInstance.current.disconnect();
       console.log('ENDED too');
+      if (!beforeCall) {
+        setTimeout(() => {
+          navigate(`/cal/${eventId}`);
+        }, 1000);
+      }
     }
-  }, [dataSingle]);
+    // if (!beforeCall && !inCall) {
+    //   setTimeout(() => {
+    //     navigate(`/cal/${eventId}`);
+    //   }, 1000);
+    // }
+    console.log('HELLLLLOO');
+    console.log(peerInstance);
+    console.log(peerInstance?.current);
+    console.log(peerInstance?.current?._id);
+    if (
+      dataSingle &&
+      isOwner &&
+      beforeCall &&
+      peerInstance &&
+      peerInstance.current &&
+      peerInstance.current._id
+    ) {
+      console.log('HIIII');
+      console.log(peerInstance);
+      console.log(peerInstance.current);
+      console.log(peerInstance.current._id);
+      console.log('RUN BRO RUN');
+      call();
+    }
+  }, [dataSingle, peerInstance?.current?._id]);
 
   useEffect(() => {
     const peer = new Peer({
       host: 'manwar.dev',
       port: 443,
       path: '/peerjs/meetme',
-      debug: 4,
-      //REMOVE DEBUG FOR PRODUCTION
     });
 
     peer.on('open', (id) => {
@@ -116,18 +143,20 @@ export default function VideoCall() {
     });
 
     peerInstance.current = peer;
+    // console.log('JUST SET');
+    // console.log(peerInstance.current);
   }, [isOwner, userProfile._id]);
 
   const call = () => {
     let bJoin = false;
+    console.log('SINGLE AGAIN');
+    console.log(dataSingle);
     if (dataSingle) {
-      setBookerJoined(!(dataSingle.getSlot.peerId === null));
       bJoin = !(dataSingle.getSlot.peerId === null);
     }
     if (bJoin) {
       setBeforeCall(false);
       setInCall(true);
-      setBeginDisabled(true);
       console.log('SETTING 3, getting REMOTE user media on call with rem ');
       let remPeerId = null;
       console.log('I am owner');
@@ -164,6 +193,8 @@ export default function VideoCall() {
   };
 
   const endCall = () => {
+    setInCall(false);
+
     const peerCxn = {
       eventId: eventId,
       slotId: tsId,
@@ -174,31 +205,21 @@ export default function VideoCall() {
       variables: { input: peerCxn },
     });
 
-    setInCall(false);
     currentUserVideoRef.current.srcObject = null;
     remoteVideoRef.current.srcObject = null;
-    peerInstance.current.disconnect();
+    peerInstance.current = null;
+    //peerInstance.current.disconnect();
     console.log('ENDED');
+    setTimeout(() => {
+      navigate(`/cal/${eventId}`);
+    }, 1000);
   };
 
   return (
     <React.Fragment>
       {beforeCall && isOwner ? (
         <Box display="flex" flexDirection="row" justifyContent="center" m={2}>
-          <Button
-            variant="outlined"
-            disabled={beginDisabled}
-            onClick={() => call()}
-          >
-            Begin Call
-          </Button>
-        </Box>
-      ) : null}
-      {beforeCall && isOwner && !bookerJoined ? (
-        <Box display="flex" alignItems="center" justifyContent="center" m={2}>
-          <Typography>
-            Please wait for participant to join the meeting.
-          </Typography>
+          <Typography>Connecting ...</Typography>
         </Box>
       ) : null}
       {beforeCall && !isOwner ? (
@@ -233,12 +254,9 @@ export default function VideoCall() {
           alignItems="center"
           m={1}
         >
-          <Typography style={{ color: 'red' }}>The call was ended</Typography>
-
-          <Typography>Click here to go back to your profile </Typography>
-          <Button variant="contained" onClick={() => navigate('/profile')}>
-            Profile
-          </Button>
+          <Typography style={{ color: 'red' }}>
+            The call was ended. Redirecting...
+          </Typography>
         </Box>
       ) : null}
     </React.Fragment>
