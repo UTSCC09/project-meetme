@@ -11,7 +11,7 @@ import format from 'date-fns/format';
 import { add, getUnixTime, isBefore } from 'date-fns';
 import { CREATE_SLOTS, DELETE_SLOT } from '../../graphql/mutations';
 import { GET_EVENT } from '../../graphql/queries';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 
 export default function OwnerCalendar({
   slots,
@@ -89,10 +89,10 @@ export default function OwnerCalendar({
 
   const eventPropGetter = (event) => {
     let backgroundColor = '';
-    if (event.peerId == null || event.peerId == callEnded) {
-      backgroundColor = '';
-    } else {
+    if (event.peerId && event.peerId !== callEnded) {
       backgroundColor = 'green';
+    } else {
+      backgroundColor = '';
     }
     return { style: { backgroundColor } };
   };
