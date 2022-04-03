@@ -71,8 +71,9 @@ export default function VideoCall() {
 
   useEffect(() => {
     const peer = new Peer({
-      host: 'meetme-peers.herokuapp.com',
-      port: 80,
+      host: 'manwar.dev',
+      port: 443,
+      path: '/peerjs/meetme',
       debug: 4,
       //REMOVE DEBUG FOR PRODUCTION
     });
