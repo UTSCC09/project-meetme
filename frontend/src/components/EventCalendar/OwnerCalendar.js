@@ -10,22 +10,21 @@ import enCA from 'date-fns/locale/en-CA';
 import format from 'date-fns/format';
 import { add, getUnixTime, isBefore } from 'date-fns';
 import { CREATE_SLOTS, DELETE_SLOT } from '../../graphql/mutations';
-import { GET_EVENT } from '../../graphql/queries';
 import { useMutation } from '@apollo/client';
+import { useSubscribeToMore } from '../../hooks/useSubscribeToMore';
 
 export default function OwnerCalendar({
   slots,
-  setSlots,
   eventId,
   timeslotLength,
   isOwner,
+  subToUpdates,
+  defaultDate,
 }) {
-  const [createSlots] = useMutation(CREATE_SLOTS, {
-    refetchQueries: [GET_EVENT],
-  });
-  const [deleteSlot] = useMutation(DELETE_SLOT, {
-    refetchQueries: [GET_EVENT],
-  });
+  useSubscribeToMore(subToUpdates);
+
+  const [createSlots] = useMutation(CREATE_SLOTS);
+  const [deleteSlot] = useMutation(DELETE_SLOT);
 
   const callEnded = 'Call Ended';
   const [seeSlot, setSeeSlot] = useState(false);
@@ -142,6 +141,7 @@ export default function OwnerCalendar({
         startAccessor="start"
         endAccessor="end"
         defaultView={Views.WEEK}
+        defaultDate={defaultDate}
         views={['week', 'day']}
         style={{ height: 500 }}
         step={timeslotLength}

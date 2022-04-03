@@ -11,22 +11,20 @@ import { Box, TextField, Button, Typography } from '@mui/material';
 import { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { BOOK_SLOT, UNBOOK_SLOT } from '../../graphql/mutations';
-import { GET_EVENT } from '../../graphql/queries';
 import { useMutation } from '@apollo/client';
+import { useSubscribeToMore } from '../../hooks/useSubscribeToMore';
 
 export default function BookerCalendar({
   slots,
-  setSlots,
   eventId,
   timeslotLength,
   isOwner,
+  subToUpdates,
+  defaultDate,
 }) {
-  const [bookSlot] = useMutation(BOOK_SLOT, {
-    refetchQueries: [GET_EVENT],
-  });
-  const [unbookSlot] = useMutation(UNBOOK_SLOT, {
-    refetchQueries: [GET_EVENT],
-  });
+  useSubscribeToMore(subToUpdates);
+  const [bookSlot] = useMutation(BOOK_SLOT);
+  const [unbookSlot] = useMutation(UNBOOK_SLOT);
 
   const [book, setBook] = useState(false);
   const [unBook, setUnBook] = useState(false);
@@ -162,6 +160,7 @@ export default function BookerCalendar({
         startAccessor="start"
         endAccessor="end"
         defaultView={Views.WEEK}
+        defaultDate={defaultDate}
         views={['week', 'day']}
         style={{ height: 500 }}
         step={timeslotLength}
