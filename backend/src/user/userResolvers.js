@@ -1,6 +1,6 @@
 const userResolvers = {
     Query: {
-        me: (_, _, { user }) => user,
+        me: (_, args, { user }) => user,
         user: async (parent, { email }, { models }) =>
             models.User.findOne({ email }),
         eventsOwned: async (_, { email, page }, { models }) => {
@@ -13,8 +13,12 @@ const userResolvers = {
             })
                 .sort({ created_at: -1 })
                 .skip(page * 5)
-                .limit(5);
-            return events;
+                .limit(6);
+            const hasMore = events.length === 6;
+            return {
+                events: events.slice(0, 5),
+                hasMore,
+            };
         },
     },
 };
