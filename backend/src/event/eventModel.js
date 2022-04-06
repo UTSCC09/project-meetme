@@ -72,6 +72,5 @@ eventSchema.statics.throwIfOwner = async function (eventId, userId) {
     });
 };
 
-
 const Event = model("Event", eventSchema);
 export default Event;
