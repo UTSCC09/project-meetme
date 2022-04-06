@@ -23,18 +23,6 @@ const GET_EVENT = gql`
         email
         _id
       }
-      timeslots {
-        _id
-        start
-        end
-        title
-        comment
-        bookerId {
-          _id
-          username
-        }
-        peerId
-      }
     }
   }
 `;
@@ -70,24 +58,6 @@ const GET_TIMESLOT = gql`
   }
 `;
 
-const GET_TIMESLOTS = gql`
-  query event($id: String!) {
-    event(id: $id) {
-      timeslots {
-        _id
-        start
-        end
-        title
-        comment
-        bookerId {
-          _id
-          username
-        }
-        peerId
-      }
-    }
-  }
-`;
 
 const GET_TIMESLOTS_IN_RANGE = gql`
   query getSlotsBetween($input: getSlotsInput!) {
@@ -111,6 +81,5 @@ export {
   GET_EVENT,
   GET_EVENTS,
   GET_TIMESLOT,
-  GET_TIMESLOTS,
   GET_TIMESLOTS_IN_RANGE,
 };

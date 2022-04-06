@@ -25,10 +25,11 @@ const createSlots = async (parent, { input }, { models, user }) => {
 
     await models.Event.throwIfNotOwner(eventId, user._id);
 
+    const event = await models.Event.getEvent(eventId)
+
+
     const createdSlots = await models.Timeslot.createSlots(eventId, slots);
 
-    // @DEPRECATED
-    // await models.Event.addSlots(eventId, createdSlots);
 
     const createdSlotsArray = Array.isArray(createdSlots)
         ? createdSlots
@@ -47,17 +48,6 @@ const bookSlot = async (parent, { input }, { models, user }) => {
 
     await models.Event.throwIfOwner(eventId, user._id);
 
-    // @DEPRECATED
-    /*
-    const toBeUpdated = await models.Event.bookSlot(
-        eventId,
-        slotId,
-        user._id,
-        title,
-        comment
-    );
-    */
-
     const bookedSlot = await models.Timeslot.bookSlot(
         slotId,
         user._id,
@@ -75,8 +65,6 @@ const unbookSlot = async (parent, { input }, { models }) => {
     // TODO: Check that booker is unbooking
     const { eventId, slotId, title = "", comment = "" } = input;
 
-    // @DEPRECATED
-    // await models.Event.unbookSlot(eventId, slotId, title, comment);
 
     const unbookedSlot = await models.Timeslot.unbookSlot(slotId);
     await unbookedSlot.populate("bookerId");
@@ -93,15 +81,10 @@ const deleteSlot = async (parent, { input }, { models, user }) => {
     await models.Event.throwIfNotEvent(eventId);
     await models.Event.throwIfNotOwner(eventId, user._id);
 
-    // @DEPRECATED
-    // const toDelete = await models.Event.getSlot(eventId, slotId);
     const toDelete = await models.Timeslot.getSlot(slotId);
     await toDelete.populate("bookerId");
 
     await models.Timeslot.deleteSlot(slotId);
-    //
-    // @DEPRECATED
-    // await models.Event.deleteSlot(eventId, slotId);
     publish(eventId, "DELETE", toDelete);
 
     return toDelete;
@@ -116,7 +99,6 @@ const getSlot = async (parent, { input }, { models }) => {
 
 const addPeerId = async (parent, { input }, { models }) => {
     const { eventId, slotId, peerId } = input;
-    // await models.Event.addPeerId(eventId, slotId, peerId);
     const updatedSlot = await models.Timeslot.addPeerId(slotId, peerId);
     await updatedSlot.populate("bookerId");
     publish(eventId, "UPDATE", updatedSlot);
